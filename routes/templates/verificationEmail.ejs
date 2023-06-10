@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ojinn - Email Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f7f7f7;
+      border-radius: 8px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    .verification-code {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #33A1FF; /* Updated color: blue */
+      text-align: center;
+      font-size: 36px; /* Increased font size */
+      font-weight: bold;
+      border-radius: 8px;
+      letter-spacing: 10px; /* Increased letter spacing */
+      color: #fff; /* Set text color to white */
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Email Verification</h1>
+    <p>Dear User,</p>
+    <p>Thank you for syncing up with Ojinn. To complete your email verification, please use the following verification code:</p>
+    <div class="verification-code">
+      <%= code %>
+    </div>
+    <p>If you did not request this verification, please ignore this email.</p>
+    <div class="footer">
+      <p>Best regards,</p>
+      <p>The Ojinn Team</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -2,23 +2,24 @@ const express=require("express")
 const router=express.Router();
 const mongoose=require("mongoose")
 const User=mongoose.model("User")
-
+const { v4: uuidv4 } = require("uuid");
 require("dotenv").config()
 
 
 router.post("/overlappingSchedule", (req, res) => {
-    const { email, title, duration, start,category,dueDate } = req.body;
-
-    if (!email || !title || !duration || !start||!category||!dueDate) {
+    const { email, title,start,end,scheduledStart,category,dueDate,createdAt } = req.body;
+    const taskId = uuidv4();
+    if (!email || !title || !start||!end||!scheduledStart||!category||!dueDate ||!createdAt) {
         return res.status(422).json({ error: "Required fields are missing" });
-    } else {
+    } 
+    else {
             User.findOne({ email: email })
                 .then((savedUser) => {
                     if (!savedUser) {
-                        return res.status(422).json({ error: "Invalid Credentials" });
+                        return res.status(200).json({ message: "Invalid Credentials" });
                     }
-    
-                    const end = calculateEndTime(start, duration);
+                    const duration=calculateDuration(start,end)
+                    const endTime = calculateEndTime(scheduledStart, duration);
                     // const overlappingTasks = savedUser.tasks.filter((task) => {
                     //     return (task.start < end && task.end > start);
                     // });
@@ -26,10 +27,10 @@ router.post("/overlappingSchedule", (req, res) => {
                     // if (overlappingTasks.length > 0) {
                     //     return res.status(422).json({ error: "New task overlaps with previously added tasks" });
                     // }
-                    if(end<start){
-                        return res.status(422).json({error:"Schedule extending to other date"})
+                    if(endTime<scheduledStart){
+                        return res.status(200).json({message:"Schedule extending to other date"})
                     }
-                    savedUser.tasks.push({ title, start, end, dueDate, category});
+                    savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId});
                     savedUser.save()
                         .then((user) => {
                             res.json({ message: "Task added successfully" });
@@ -65,6 +66,16 @@ router.post("/overlappingSchedule", (req, res) => {
         const formattedEndMinute = endMinute.toString().padStart(2, '0');
       
         return `${formattedEndHour}:${formattedEndMinute}`;
+      }
+      
+      function calculateDuration(start, end) {
+        const startTime = new Date(`2000-01-01T${start}:00`);
+        const endTime = new Date(`2000-01-01T${end}:00`);
+    
+        const differenceMs = endTime - startTime;
+        const durationMinutes = Math.round(differenceMs / 60000);
+      
+        return durationMinutes;
       }
       
 

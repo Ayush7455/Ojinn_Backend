@@ -13,7 +13,7 @@ router.post("/getTasks", (req, res) => {
   User.findOne({ email: email })
     .then((user) => {
       const tasks = user.tasks.filter((task) => {
-        return (task.dueDate>=selectedDate);
+        return (task.dueDate>=selectedDate && task.createdAt<=selectedDate);
       });
       res.status(200).send(tasks);
     })

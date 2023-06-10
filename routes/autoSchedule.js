@@ -2,16 +2,17 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
+const { v4: uuidv4 } = require("uuid");
 
 require("dotenv").config();
 
 router.post("/autoschedule", (req, res) => {
-  const { email, title, duration, category, dueDate } = req.body;
+  const { email, title, startSchedule,endSchedule, category, dueDate,createdAt } = req.body;
 
-  if (!email || !title || !duration || !category || !dueDate) {
+  if (!email || !title || !startSchedule ||!endSchedule|| !category || !dueDate||!createdAt) {
     return res.status(422).json({ error: "Required fields are missing" });
   }
-
+  const taskId = uuidv4();
   User.findOne({ email: email })
     .then((savedUser) => {
       if (!savedUser) {
@@ -21,6 +22,7 @@ router.post("/autoschedule", (req, res) => {
       const currentTime = new Date();
       const currentHour = currentTime.getHours();
       const currentMinute = currentTime.getMinutes();
+      const duration=calculateDuration(startSchedule,endSchedule)
 
       let startTime;
       if (dueDate === getCurrentDate()) {
@@ -33,7 +35,7 @@ router.post("/autoschedule", (req, res) => {
       let end = calculateEndTime(startTime, duration);
 
       let overlappingTasks = existingTasks.filter((task) => {
-        return task.start <= end && task.end >= startTime && task.dueDate >= dueDate;
+        return (task.start <= end && task.end >= startTime && task.dueDate >= dueDate&&dueDate>=task.createdAt);
       });
 
       while (overlappingTasks.length > 0) {
@@ -45,12 +47,12 @@ router.post("/autoschedule", (req, res) => {
         end = calculateEndTime(startTime, duration);
 
         overlappingTasks = existingTasks.filter((task) => {
-          return task.start <= end && task.end >= startTime && task.dueDate >= dueDate;
+          return (task.start <= end && task.end >= startTime && task.dueDate >= dueDate&&dueDate>=task.createdAt);
         });
       }
 
       if (end < startTime) {
-        return res.status(422).json({ error: "No available slot found for scheduling" });
+        return res.status(200).json({ message: "No available slot found for scheduling" });
       }
 
       const newTask = {
@@ -59,6 +61,8 @@ router.post("/autoschedule", (req, res) => {
         end,
         dueDate,
         category,
+        createdAt,
+        taskId
       };
 
       savedUser.tasks.push(newTask);
@@ -105,5 +109,13 @@ function getCurrentDate() {
   const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/$${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
   return formattedDate;
 }
+function calculateDuration(start, end) {
+  const startTime = new Date(`2000-01-01T${start}:00`);
+  const endTime = new Date(`2000-01-01T${end}:00`);
 
+  const differenceMs = endTime - startTime;
+  const durationMinutes = Math.round(differenceMs / 60000);
+
+  return durationMinutes;
+}
 module.exports = router;
