@@ -45,7 +45,7 @@ router.post('/syncEmail', async (req, res) => {
       await mailer(email, verificationCode);
       res.send({ verificationCode });
     } else {
-      res.status(200).json({ message: "User not found" });
+      res.status(200).json({ message: "Entered Email is either invalid or not registered with Ojinn" });
     }
   } catch (err) {
     console.log(err);
