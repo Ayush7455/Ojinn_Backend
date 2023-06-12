@@ -35,7 +35,7 @@ router.post("/autoschedule", (req, res) => {
       let end = calculateEndTime(startTime, duration);
 
       let overlappingTasks = existingTasks.filter((task) => {
-        return (task.start <= end && task.end >= startTime && task.dueDate >= dueDate&&dueDate>=task.createdAt);
+        return (task.start <= end && task.end >= startTime && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
       });
 
       while (overlappingTasks.length > 0) {
@@ -47,7 +47,7 @@ router.post("/autoschedule", (req, res) => {
         end = calculateEndTime(startTime, duration);
 
         overlappingTasks = existingTasks.filter((task) => {
-          return (task.start <= end && task.end >= startTime && task.dueDate >= dueDate&&dueDate>=task.createdAt);
+          return (task.start <= end && task.end >= startTime && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
         });
       }
 

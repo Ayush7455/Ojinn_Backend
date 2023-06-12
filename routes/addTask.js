@@ -3,11 +3,13 @@ const router=express.Router();
 const mongoose=require("mongoose")
 const User=mongoose.model("User")
 const { v4: uuidv4 } = require("uuid");
+const moment=require("moment")
 
 require("dotenv").config()
 
 router.post("/addTask", (req, res) => {
     const { email, title, start, end, dueDate, category,createdAt} = req.body;
+    const today = moment(new Date()).format('MM/DD/YYYY')
 
     if (!email || !title || !start || !end || !dueDate || !category || !createdAt) {
         return res.status(200).json({ message: "Required fields are missing" });
@@ -21,7 +23,7 @@ router.post("/addTask", (req, res) => {
                 
             
                 const  overlappingTasks = savedUser.tasks.filter((task) => {
-                    return (task.start <= end && task.end >= start && task.dueDate >= dueDate&&dueDate>=task.createdAt);
+                    return (task.start <= end && task.end >= start && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
                   });
                   console.log(overlappingTasks.length)
                   console.log(overlappingTasks)
