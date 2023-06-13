@@ -7,9 +7,9 @@ const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 
 router.post("/autoschedule", (req, res) => {
-  const { email, title, startSchedule,endSchedule, category, dueDate,createdAt } = req.body;
+  const { email, title, startSchedule,endSchedule, category, dueDate,createdAt ,color} = req.body;
 
-  if (!email || !title || !startSchedule ||!endSchedule|| !category || !dueDate||!createdAt) {
+  if (!email || !title || !startSchedule ||!endSchedule|| !category || !dueDate||!createdAt||!color) {
     return res.status(422).json({ error: "Required fields are missing" });
   }
   const taskId = uuidv4();
@@ -62,7 +62,8 @@ router.post("/autoschedule", (req, res) => {
         dueDate,
         category,
         createdAt,
-        taskId
+        taskId,
+        color
       };
 
       savedUser.tasks.push(newTask);

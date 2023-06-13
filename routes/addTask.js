@@ -8,10 +8,10 @@ const moment=require("moment")
 require("dotenv").config()
 
 router.post("/addTask", (req, res) => {
-    const { email, title, start, end, dueDate, category,createdAt} = req.body;
+    const { email, title, start, end, dueDate, category,createdAt,color} = req.body;
     const today = moment(new Date()).format('MM/DD/YYYY')
 
-    if (!email || !title || !start || !end || !dueDate || !category || !createdAt) {
+    if (!email || !title || !start || !end || !dueDate || !category || !createdAt||!color) {
         return res.status(200).json({ message: "Required fields are missing" });
     } 
     else {
@@ -31,7 +31,7 @@ router.post("/addTask", (req, res) => {
                     return res.status(200).json({ message: "New task overlaps with previously added tasks" });
                 }
                 const taskId = uuidv4();
-                savedUser.tasks.push({ title, start, end, dueDate, category,createdAt,taskId});
+                savedUser.tasks.push({ title, start, end, dueDate, category,createdAt,taskId,color});
                 savedUser.save()
                     .then((user) => {
                         res.json({ message: "Task added successfully" });

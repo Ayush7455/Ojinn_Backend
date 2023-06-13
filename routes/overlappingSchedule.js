@@ -7,9 +7,9 @@ require("dotenv").config()
 
 
 router.post("/overlappingSchedule", (req, res) => {
-    const { email, title,start,end,scheduledStart,category,dueDate,createdAt } = req.body;
+    const { email, title,start,end,scheduledStart,category,dueDate,createdAt,color } = req.body;
     const taskId = uuidv4();
-    if (!email || !title || !start||!end||!scheduledStart||!category||!dueDate ||!createdAt) {
+    if (!email || !title || !start||!end||!scheduledStart||!category||!dueDate ||!createdAt||!color) {
         return res.status(422).json({ error: "Required fields are missing" });
     } 
     else {
@@ -30,7 +30,7 @@ router.post("/overlappingSchedule", (req, res) => {
                     if(endTime<scheduledStart){
                         return res.status(200).json({message:"Schedule extending to other date"})
                     }
-                    savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId});
+                    savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId,color});
                     savedUser.save()
                         .then((user) => {
                             res.json({ message: "Task added successfully" });

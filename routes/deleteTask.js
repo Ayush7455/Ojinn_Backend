@@ -5,7 +5,7 @@ const User = mongoose.model("User");
 
 require("dotenv").config();
 
-// Add the DELETE route
+
 router.delete("/deleteTask/:taskId", (req, res) => {
   const { email } = req.body;
   const { taskId } = req.params;
@@ -19,7 +19,7 @@ router.delete("/deleteTask/:taskId", (req, res) => {
           return res.status(200).json({ message: "Invalid Credentials" });
         }
 
-        // Find the index of the task with the given taskId
+    
         const taskIndex = savedUser.tasks.findIndex(
           (task) => task.taskId === taskId
         );
@@ -28,7 +28,7 @@ router.delete("/deleteTask/:taskId", (req, res) => {
           return res.status(200).json({ message: "Task not found" });
         }
 
-        // Remove the task from the tasks array
+       
         savedUser.tasks.splice(taskIndex, 1);
 
         savedUser

@@ -38,7 +38,7 @@ router.post('/syncEmail', async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email }); // Find the user in the User model
+    const user = await User.findOne({ email }); 
 
     if (user) {
       let verificationCode = Math.floor(1000 + Math.random() * 9000);

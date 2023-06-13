@@ -12,6 +12,8 @@ const autoSchedule = require('./routes/autoSchedule');
 const syncEmail = require('./routes/syncEmail');
 const getAllTasks = require('./routes/getAllTasks');
 const deleteTask=require("./routes/deleteTask")
+const getCategories=require("./routes/getCategories")
+const editCategories=require("./routes/editCategories")
 app.use(bodyParser.json());
 app.use(addTask);
 app.use(addUser);
@@ -21,7 +23,8 @@ app.use(autoSchedule);
 app.use(syncEmail);
 app.use(getAllTasks);
 app.use(deleteTask);
-
+app.use(getCategories);
+app.use(editCategories);
 
 app.listen(port, () => {
     console.log("Server is running on port " + port);
