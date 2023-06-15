@@ -16,6 +16,7 @@ const getCategories=require("./routes/getCategories")
 const editCategories=require("./routes/editCategories")
 const addTaskDescription=require("./routes/addTaskDescription")
 const addTaskNotes=require("./routes/addTaskNotes")
+const getTaskNotes=require("./routes/getTaskNotes")
 app.use(bodyParser.json());
 app.use(addTask);
 app.use(addUser);
@@ -29,6 +30,7 @@ app.use(getCategories);
 app.use(editCategories);
 app.use(addTaskDescription)
 app.use(addTaskNotes)
+app.use(getTaskNotes)
 app.listen(port, () => {
     console.log("Server is running on port " + port);
 })
