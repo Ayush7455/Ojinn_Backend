@@ -31,7 +31,7 @@ router.post("/addTask", (req, res) => {
                     return res.status(200).json({ message: "New task overlaps with previously added tasks" });
                 }
                 const taskId = uuidv4();
-                savedUser.tasks.push({ title, start, end, dueDate, category,createdAt,taskId,color});
+                savedUser.tasks.push({ title, start, end, dueDate, category,createdAt,taskId,color,description:"",notes:""});
                 savedUser.save()
                     .then((user) => {
                         res.json({ message: "Task added successfully" });

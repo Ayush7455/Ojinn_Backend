@@ -30,7 +30,7 @@ router.post("/overlappingSchedule", (req, res) => {
                     if(endTime<scheduledStart){
                         return res.status(200).json({message:"Schedule extending to other date"})
                     }
-                    savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId,color});
+                    savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId,color,description:"",notes:""});
                     savedUser.save()
                         .then((user) => {
                             res.json({ message: "Task added successfully" });
