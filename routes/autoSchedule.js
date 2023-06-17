@@ -62,7 +62,8 @@ router.post("/autoschedule", (req, res) => {
         taskId,
         color,
         description:"",
-        notes:""
+        notes:"",
+        taskCreationTime:new Date()
       };
 
       savedUser.tasks.push(newTask);
