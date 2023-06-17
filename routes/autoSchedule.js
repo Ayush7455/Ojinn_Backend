@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const { v4: uuidv4 } = require("uuid");
-
 require("dotenv").config();
 
 router.post("/autoschedule", (req, res) => {
@@ -25,7 +24,7 @@ router.post("/autoschedule", (req, res) => {
       const duration=calculateDuration(startSchedule,endSchedule)
 
       let startTime;
-      if (dueDate === getCurrentDate()) {
+      if (createdAt === getCurrentDate()) {
         startTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
       } else {
         startTime = "00:00";
@@ -109,7 +108,7 @@ function calculateEndTime(startTime, duration) {
 
 function getCurrentDate() {
   const currentDate = new Date();
-  const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/$${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+  const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
   return formattedDate;
 }
 function calculateDuration(start, end) {
