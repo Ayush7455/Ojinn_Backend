@@ -23,12 +23,11 @@ router.post("/autoschedule", (req, res) => {
       const currentMinute = currentTime.getMinutes();
       const duration=calculateDuration(startSchedule,endSchedule)
 
-      let startTime= "13:32";
-      // if (createdAt === getCurrentDate()) {
-      //   startTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
-      // } else {
-      //   startTime = "00:00";
-      // }
+      if (createdAt === getCurrentDate()) {
+        startTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
+      } else {
+        startTime = "00:00";
+      }
 
       const existingTasks = savedUser.tasks;
       let end = calculateEndTime(startTime, duration);
