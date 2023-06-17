@@ -33,7 +33,7 @@ router.post("/overlappingSchedule", (req, res) => {
                     savedUser.tasks.push({ title, start:scheduledStart, end:endTime, dueDate, category,createdAt,taskId,color,description:"",notes:""});
                     savedUser.save()
                         .then((user) => {
-                            res.json({ message: "Task added successfully" });
+                            res.json({ message: "Task added successfully",endTime});
                         })
                         .catch((err) => {
                             res.json({ error: "Error adding Task" });
