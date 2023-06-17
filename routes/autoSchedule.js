@@ -21,48 +21,46 @@ router.post("/autoschedule", (req, res) => {
       const currentTime = new Date();
       const currentHour = currentTime.getHours();
       const currentMinute = currentTime.getMinutes();
-      const duration=calculateDuration(startSchedule,endSchedule)
-
+      const duration = calculateDuration(startSchedule, endSchedule);
+      let startTime = startSchedule;
+    
       if (createdAt === getCurrentDate()) {
         startTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
-      } else {
-        startTime = "00:00";
       }
-
+    
       const existingTasks = savedUser.tasks;
       let end = calculateEndTime(startTime, duration);
-
+    
       let overlappingTasks = existingTasks.filter((task) => {
-        return (task.start <= end && task.end >= startTime && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
+        return (
+          task.start <= end &&
+          task.end >= startTime &&
+          (((task.createdAt > createdAt && task.dueDate > dueDate && dueDate >= task.createdAt) ||
+            (task.createdAt > createdAt && task.dueDate < dueDate && dueDate >= task.createdAt) ||
+            (task.createdAt > createdAt && task.dueDate == dueDate && dueDate >= task.createdAt)) ||
+            ((task.createdAt < createdAt && task.dueDate > dueDate && task.dueDate >= createdAt) ||
+              (task.createdAt < createdAt && task.dueDate < dueDate && task.dueDate >= createdAt) ||
+              (task.createdAt < createdAt && task.dueDate == dueDate && task.dueDate >= createdAt)) ||
+            ((task.createdAt == createdAt && task.dueDate > dueDate) ||
+              (task.createdAt == createdAt && task.dueDate < dueDate) ||
+              (task.createdAt == createdAt && task.dueDate == dueDate)))
+        );
       });
-
-      while (overlappingTasks.length > 0) {
+    
+      while (overlappingTasks.length > 0 && end >= startTime) {
         const [hour, minute] = startTime.split(":");
         const currentHour = parseInt(hour, 10);
         const currentMinute = parseInt(minute, 10);
         let nextHour = currentHour;
         let nextMinute = (currentMinute + 1) % 60;
-      
+        
         if (nextMinute === 0) {
           nextHour = (currentHour + 1) % 24;
         }
-      
-        // Skip the morning slots if createdAt is today
-        if (createdAt === getCurrentDate()) {
-          const currentTime = getCurrentTime();
-          const [curHour, curMinute] = currentTime.split(":");
-          const currentHr = parseInt(curHour, 10);
-          const currentMin = parseInt(curMinute, 10);
-      
-          if (nextHour < currentHr || (nextHour === currentHr && nextMinute <= currentMin)) {
-            nextHour = currentHr;
-            nextMinute = currentMin + 1;
-          }
-        }
-      
+    
         startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
         end = calculateEndTime(startTime, duration);
-      
+    
         overlappingTasks = existingTasks.filter((task) => {
           return (
             task.start <= end &&
@@ -79,7 +77,7 @@ router.post("/autoschedule", (req, res) => {
           );
         });
       }
-
+    
       if (end < startTime) {
         return res.status(200).json({ message: "No available slot found for scheduling" });
       }
