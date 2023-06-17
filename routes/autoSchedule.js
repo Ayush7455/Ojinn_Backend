@@ -70,7 +70,7 @@ router.post("/autoschedule", (req, res) => {
       savedUser
         .save()
         .then((user) => {
-          res.json({ message: "Task added successfully",startTime });
+          res.json({ message: "Task added successfully",startTime,end});
         })
         .catch((err) => {
           res.json({ error: "Error adding Task" });
