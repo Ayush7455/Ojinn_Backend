@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-
+const currentTime = new Date();
+      const currentHour = currentTime.getHours();
+      const currentMinute = currentTime.getMinutes();
 router.post("/autoschedule", (req, res) => {
   const { email, title, startSchedule,endSchedule, category, dueDate,createdAt ,color} = req.body;
 
@@ -156,4 +158,5 @@ function calculateDuration(start, end) {
 
   return durationMinutes;
 }
+console.log(`${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`)
 module.exports = router;
