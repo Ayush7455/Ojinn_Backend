@@ -4,13 +4,11 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-const currentTime = new Date();
-      const currentHour = currentTime.getHours();
-      const currentMinute = currentTime.getMinutes();
-router.post("/autoschedule", (req, res) => {
-  const { email, title, startSchedule,endSchedule, category, dueDate,createdAt ,color} = req.body;
 
-  if (!email || !title || !startSchedule ||!endSchedule|| !category || !dueDate||!createdAt||!color) {
+router.post("/autoschedule", (req, res) => {
+  const { email, title, startSchedule,endSchedule, category, dueDate,createdAt ,color,currentTime,currentDate} = req.body;
+
+  if (!email || !title || !startSchedule ||!endSchedule|| !category || !dueDate||!createdAt||!color||!currentTime||!currentDate) {
     return res.status(422).json({ error: "Required fields are missing" });
   }
   const taskId = uuidv4();
@@ -20,74 +18,36 @@ router.post("/autoschedule", (req, res) => {
         return res.status(422).json({ error: "Invalid Credentials" });
       }
 
-      const currentTime = new Date();
-      const currentHour = currentTime.getHours();
-      const currentMinute = currentTime.getMinutes();
-      const duration = calculateDuration(startSchedule, endSchedule);
-      let startTime = startSchedule;
-    
-      if (createdAt === getCurrentDate()) {
-        startTime = `${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
+ 
+      const duration=calculateDuration(startSchedule,endSchedule)
+
+      let startTime;
+      if (createdAt === currentDate) {
+        startTime = currentTime;
+      } else {
+        startTime = "00:00";
       }
-    
+
       const existingTasks = savedUser.tasks;
       let end = calculateEndTime(startTime, duration);
-    
+
       let overlappingTasks = existingTasks.filter((task) => {
-        return (
-          task.start <= end &&
-          task.end >= startTime &&
-          (((task.createdAt > createdAt && task.dueDate > dueDate && dueDate >= task.createdAt) ||
-            (task.createdAt > createdAt && task.dueDate < dueDate && dueDate >= task.createdAt) ||
-            (task.createdAt > createdAt && task.dueDate == dueDate && dueDate >= task.createdAt)) ||
-            ((task.createdAt < createdAt && task.dueDate > dueDate && task.dueDate >= createdAt) ||
-              (task.createdAt < createdAt && task.dueDate < dueDate && task.dueDate >= createdAt) ||
-              (task.createdAt < createdAt && task.dueDate == dueDate && task.dueDate >= createdAt)) ||
-            ((task.createdAt == createdAt && task.dueDate > dueDate) ||
-              (task.createdAt == createdAt && task.dueDate < dueDate) ||
-              (task.createdAt == createdAt && task.dueDate == dueDate)))
-        );
+        return (task.start <= end && task.end >= startTime && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
       });
-    
-      while (overlappingTasks.length > 0 && end >= startTime) {
+
+      while (overlappingTasks.length > 0 && end >startTime)  {
         const [hour, minute] = startTime.split(":");
-        const currentHour = parseInt(hour, 10);
         const currentMinute = parseInt(minute, 10);
-        let nextHour = currentHour;
-        let nextMinute = (currentMinute + 1) % 60;
-      
-        if (nextMinute === 0) {
-          nextHour = (currentHour + 1) % 24;
-        }
-      
-        const currentTimeObj = new Date();
-        currentTimeObj.setHours(currentHour, currentMinute, 0, 0);
-        const nextTimeObj = new Date();
-        nextTimeObj.setHours(nextHour, nextMinute, 0, 0);
-      
-        if (currentTimeObj > currentTime || nextTimeObj > currentTime) {
-          startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
-          end = calculateEndTime(startTime, duration);
-      
-          overlappingTasks = existingTasks.filter((task) => {
-            return (
-              task.start <= end &&
-              task.end >= startTime &&
-              (((task.createdAt > createdAt && task.dueDate > dueDate && dueDate >= task.createdAt) ||
-                (task.createdAt > createdAt && task.dueDate < dueDate && dueDate >= task.createdAt) ||
-                (task.createdAt > createdAt && task.dueDate == dueDate && dueDate >= task.createdAt)) ||
-                ((task.createdAt < createdAt && task.dueDate > dueDate && task.dueDate >= createdAt) ||
-                  (task.createdAt < createdAt && task.dueDate < dueDate && task.dueDate >= createdAt) ||
-                  (task.createdAt < createdAt && task.dueDate == dueDate && task.dueDate >= createdAt)) ||
-                ((task.createdAt == createdAt && task.dueDate > dueDate) ||
-                  (task.createdAt == createdAt && task.dueDate < dueDate) ||
-                  (task.createdAt == createdAt && task.dueDate == dueDate)))
-            );
-          });
-        } else {
-          break;
-        }
+        const nextMinute = (currentMinute + 1) % 60;
+        const nextHour = nextMinute === 0 ? (parseInt(hour, 10) + 1) % 24 : hour;
+        startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
+        end = calculateEndTime(startTime, duration);
+
+        overlappingTasks = existingTasks.filter((task) => {
+          return (task.start <= end && task.end >= startTime && (((task.createdAt>createdAt&&task.dueDate>dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate<dueDate&&dueDate>=task.createdAt)||(task.createdAt>createdAt&&task.dueDate==dueDate&&dueDate>=task.createdAt))||((task.createdAt<createdAt&&task.dueDate>dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate<dueDate&&task.dueDate>=createdAt)||(task.createdAt<createdAt&&task.dueDate==dueDate&&task.dueDate>=createdAt))||((task.createdAt==createdAt&&task.dueDate>dueDate)||(task.createdAt==createdAt&&task.dueDate<dueDate)||(task.createdAt==createdAt&&task.dueDate==dueDate))));
+        });
       }
+
       if (end < startTime) {
         return res.status(200).json({ message: "No available slot found for scheduling" });
       }
@@ -110,7 +70,7 @@ router.post("/autoschedule", (req, res) => {
       savedUser
         .save()
         .then((user) => {
-          res.json({ message: "Task added successfully" ,startTime});
+          res.json({ message: "Task added successfully",startTime });
         })
         .catch((err) => {
           res.json({ error: "Error adding Task" });
@@ -144,11 +104,7 @@ function calculateEndTime(startTime, duration) {
   return `${formattedEndHour}:${formattedEndMinute}`;
 }
 
-function getCurrentDate() {
-  const currentDate = new Date();
-  const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
-  return formattedDate;
-}
+
 function calculateDuration(start, end) {
   const startTime = new Date(`2000-01-01T${start}:00`);
   const endTime = new Date(`2000-01-01T${end}:00`);
@@ -158,5 +114,4 @@ function calculateDuration(start, end) {
 
   return durationMinutes;
 }
-console.log(`${currentHour.toString().padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`)
 module.exports = router;
