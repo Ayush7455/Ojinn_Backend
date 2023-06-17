@@ -53,31 +53,39 @@ router.post("/autoschedule", (req, res) => {
         const currentMinute = parseInt(minute, 10);
         let nextHour = currentHour;
         let nextMinute = (currentMinute + 1) % 60;
-        
+      
         if (nextMinute === 0) {
           nextHour = (currentHour + 1) % 24;
         }
-    
-        startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
-        end = calculateEndTime(startTime, duration);
-    
-        overlappingTasks = existingTasks.filter((task) => {
-          return (
-            task.start <= end &&
-            task.end >= startTime &&
-            (((task.createdAt > createdAt && task.dueDate > dueDate && dueDate >= task.createdAt) ||
-              (task.createdAt > createdAt && task.dueDate < dueDate && dueDate >= task.createdAt) ||
-              (task.createdAt > createdAt && task.dueDate == dueDate && dueDate >= task.createdAt)) ||
-              ((task.createdAt < createdAt && task.dueDate > dueDate && task.dueDate >= createdAt) ||
-                (task.createdAt < createdAt && task.dueDate < dueDate && task.dueDate >= createdAt) ||
-                (task.createdAt < createdAt && task.dueDate == dueDate && task.dueDate >= createdAt)) ||
-              ((task.createdAt == createdAt && task.dueDate > dueDate) ||
-                (task.createdAt == createdAt && task.dueDate < dueDate) ||
-                (task.createdAt == createdAt && task.dueDate == dueDate)))
-          );
-        });
+      
+        const currentTimeObj = new Date();
+        currentTimeObj.setHours(currentHour, currentMinute, 0, 0);
+        const nextTimeObj = new Date();
+        nextTimeObj.setHours(nextHour, nextMinute, 0, 0);
+      
+        if (currentTimeObj > currentTime || nextTimeObj > currentTime) {
+          startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
+          end = calculateEndTime(startTime, duration);
+      
+          overlappingTasks = existingTasks.filter((task) => {
+            return (
+              task.start <= end &&
+              task.end >= startTime &&
+              (((task.createdAt > createdAt && task.dueDate > dueDate && dueDate >= task.createdAt) ||
+                (task.createdAt > createdAt && task.dueDate < dueDate && dueDate >= task.createdAt) ||
+                (task.createdAt > createdAt && task.dueDate == dueDate && dueDate >= task.createdAt)) ||
+                ((task.createdAt < createdAt && task.dueDate > dueDate && task.dueDate >= createdAt) ||
+                  (task.createdAt < createdAt && task.dueDate < dueDate && task.dueDate >= createdAt) ||
+                  (task.createdAt < createdAt && task.dueDate == dueDate && task.dueDate >= createdAt)) ||
+                ((task.createdAt == createdAt && task.dueDate > dueDate) ||
+                  (task.createdAt == createdAt && task.dueDate < dueDate) ||
+                  (task.createdAt == createdAt && task.dueDate == dueDate)))
+            );
+          });
+        } else {
+          break;
+        }
       }
-    
       if (end < startTime) {
         return res.status(200).json({ message: "No available slot found for scheduling" });
       }
