@@ -39,9 +39,13 @@ router.post("/autoschedule", (req, res) => {
 
       while (overlappingTasks.length > 0) {
         const [hour, minute] = startTime.split(":");
+        const currentHour = parseInt(hour, 10);
         const currentMinute = parseInt(minute, 10);
-        const nextMinute = (currentMinute + 1) % 60;
-        const nextHour = nextMinute === 0 ? (parseInt(hour, 10) + 1) % 24 : hour;
+        let nextHour = currentHour;
+        let nextMinute = (currentMinute + 1) % 60;
+        if (nextMinute === 0) {
+          nextHour = (currentHour + 1) % 24;
+        }
         startTime = `${nextHour.toString().padStart(2, "0")}:${nextMinute.toString().padStart(2, "0")}`;
         end = calculateEndTime(startTime, duration);
 
