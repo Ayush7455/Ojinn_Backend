@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const cron = require("node-cron");
+const moment = require("moment-timezone");
 require("dotenv").config();
 
 async function mailer(receiverEmail) {
@@ -24,8 +25,12 @@ async function mailer(receiverEmail) {
   });
 }
 
+// Set the default time zone to "Asia/Kolkata" (Indian Standard Time)
+moment.tz.setDefault('Asia/Kolkata');
+
 router.post('/schedule', (req, res) => {
   const { email, message, schedule } = req.body;
+
   cron.schedule(schedule, async () => {
     await mailer(email);
   });
