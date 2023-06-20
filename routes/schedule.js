@@ -26,8 +26,6 @@ async function mailer(receiverEmail) {
 
 router.post('/schedule', (req, res) => {
   const { email, message, schedule } = req.body;
-
-  // Schedule the notification
   cron.schedule(schedule, async () => {
     await mailer(email);
   });

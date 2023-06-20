@@ -35,6 +35,9 @@ app.use(addTaskNotes)
 app.use(getTaskNotes)
 app.use(addTaskEmail)
 app.use(schedule)
+const currentTime = new Date();
+const timeString = currentTime.toLocaleTimeString();
+console.log("Current time:", timeString);
 app.listen(port, () => {
     console.log("Server is running on port " + port);
 })
