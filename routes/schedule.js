@@ -3,7 +3,7 @@ const router = express.Router();
 const nodemailer = require("nodemailer");
 const cron = require("node-cron");
 require("dotenv").config();
-
+process.env.TZ = "Asia/Kolkata";
 async function mailer(receiverEmail) {
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
