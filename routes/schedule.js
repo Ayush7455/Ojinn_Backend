@@ -26,6 +26,7 @@ async function mailer(receiverEmail) {
 
 router.post('/schedule', (req, res) => {
   const { email, message, schedule } = req.body;
+  console.log(email,message,schedule)
 
   cron.schedule(schedule, async () => {
     console.log("Called")
